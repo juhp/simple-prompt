@@ -6,23 +6,21 @@ module SimplePrompt (
 
 import Control.Monad (void)
 import Data.Bool (bool)
-import Data.Char (isPrint)
 import Data.List.Extra (lower, trim)
 
-import System.IO
+import System.Console.Haskeline
 
+-- FIXME promptNonEmpty
 prompt :: String -> IO String
 prompt s = do
-  putStr $ s ++ ": "
-  tty <- openFile "/dev/tty" ReadMode
-  inp <- hGetLine tty
-  if all isPrint inp
-    then return inp
-    else do
-    putStrLn $
-      "input rejected because of unprintable character(s): '" ++
-      show inp ++ "'"
-    prompt s
+  runInputT defaultSettings loop
+    where
+      loop :: InputT IO String
+      loop = do
+        minput <- getInputLine $ s ++ ": "
+        case minput of
+          Nothing -> return ""
+          Just input -> return input
 
 prompt_ :: String -> IO ()
 prompt_ = void <$> prompt
