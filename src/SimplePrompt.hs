@@ -5,8 +5,10 @@ module SimplePrompt (
   ) where
 
 import Control.Monad (void)
+import Control.Monad.IO.Class (liftIO)
 import Data.Bool (bool)
 import Data.List.Extra (lower, trim)
+import Data.Time.Clock
 
 import System.Console.Haskeline
 
@@ -17,10 +19,19 @@ prompt s = do
     where
       loop :: InputT IO String
       loop = do
+        start <- liftIO getCurrentTime
         minput <- getInputLine $ s ++ ": "
-        case minput of
-          Nothing -> return ""
-          Just input -> return input
+        end <- liftIO getCurrentTime
+        let diff = diffUTCTime end start
+        if diff < 0.005
+          then do
+          outputStrLn $
+            "ignoring buffered input: " ++ show diff ++ " too quick"
+          loop
+          else
+          case minput of
+            Nothing -> return ""
+            Just input -> return input
 
 prompt_ :: String -> IO ()
 prompt_ = void <$> prompt
