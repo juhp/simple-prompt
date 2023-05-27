@@ -1,20 +1,33 @@
 module SimplePrompt (
   prompt,
   prompt_,
-  yesno
+  promptClear,
+  yesNo
   ) where
 
 import Control.Monad (void)
 import Control.Monad.IO.Class (liftIO)
-import Data.Bool (bool)
 import Data.List.Extra (lower, trim)
 import Data.Time.Clock
 
 import System.Console.Haskeline
 
--- FIXME promptNonEmpty
+-- | reads non-empty string
 prompt :: String -> IO String
-prompt s = do
+prompt s =
+  runInputT defaultSettings loop
+    where
+      loop :: InputT IO String
+      loop =
+        getInputLine (s ++ ": ") >>=
+        maybe loop return
+
+-- FIXME use haveTerminalUI ?
+-- | prompt which drops buffered input
+--
+-- Ignores input received in under 5ms
+promptClear :: String -> IO String
+promptClear s =
   runInputT defaultSettings loop
     where
       loop :: InputT IO String
@@ -33,16 +46,17 @@ prompt s = do
             Nothing -> return ""
             Just input -> return input
 
+-- | prompt which ignores the input
 prompt_ :: String -> IO ()
-prompt_ = void <$> prompt
+prompt_ = void <$> promptClear
 
-yesno :: Maybe Bool -> String -> IO Bool
-yesno mdefault desc = do
-  inp <- prompt $ desc ++ "? " ++ maybe "[y/n]" (bool "[y/N]" "[Y/n]") mdefault
+-- | Yes/No prompt
+yesNo :: String -> IO Bool
+yesNo desc = do
+  inp <- prompt $ desc ++ "? [y/n]"
   case trim (lower inp) of
     "y" -> return True
     "yes" -> return True
     "n" -> return False
     "no" -> return False
-    "" -> maybe (yesno Nothing desc) return mdefault
-    _ ->  yesno mdefault desc
+    _ ->  yesNo desc
