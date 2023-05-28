@@ -55,29 +55,28 @@ promptEnter =
 
 -- | Yes-No prompt (accepts only {y,n,yes,no} case-insensitive)
 yesNo :: MONADCONSTRAINT => String -> m Bool
-yesNo desc = do
-  runPrompt loop
+yesNo desc =
+  runPrompt . mapInput maybeYN . getPromptLine $ desc ++ "? [y/n]"
   where
-    loop = do
-      inp <- nonEmptyInput $ getPromptLine $ desc ++ "? [y/n]"
+    maybeYN inp =
       case trim (lower inp) of
-        "y" -> return True
-        "yes" -> return True
-        "n" -> return False
-        "no" -> return False
-        _ ->  loop
+        "y" -> Just True
+        "yes" -> Just True
+        "n" -> Just False
+        "no" -> Just False
+        _ ->  Nothing
 
 -- | Yes-No prompt with default (uses timedInput)
 yesNoDefault :: MONADCONSTRAINT => Bool -> String -> m Bool
 yesNoDefault yes desc =
-  runPrompt loop
+  runPrompt . mapInput maybeYN' . timedInput . getPromptLine $
+  desc ++ "? " ++ if yes then "[Y/n]" else "[y/N]"
   where
-    loop = do
-      inp <- timedInput $ getPromptLine $ desc ++ "? " ++ if yes then "[Y/n]" else "[y/N]"
+    maybeYN' inp =
       case trim (lower inp) of
-        "y" -> return True
-        "yes" -> return True
-        "n" -> return False
-        "no" -> return False
-        "" -> return yes
-        _ ->  loop
+        "" -> Just yes
+        "y" -> Just True
+        "yes" -> Just True
+        "n" -> Just False
+        "no" -> Just False
+        _ ->  Nothing

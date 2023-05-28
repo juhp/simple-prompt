@@ -8,6 +8,7 @@ module SimplePrompt.Internal (
   getGenericPrompt,
   runPrompt,
   guardInput,
+  mapInput,
   nonEmptyInput,
   timedInput,
   MonadIO,
@@ -66,6 +67,14 @@ guardInput p prompting = do
   if p input
     then return input
     else guardInput p prompting
+
+-- | maybe map input or loop prompt
+mapInput :: MONADCONSTRAINT => (a -> Maybe b) -> InputT m a -> InputT m b
+mapInput f prompting = do
+  input <- prompting
+  case f input of
+    Just x -> return x
+    Nothing -> mapInput f prompting
 
 -- | repeat prompt until non-empty
 nonEmptyInput :: MONADCONSTRAINT => InputT m String -> InputT m String
