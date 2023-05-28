@@ -30,6 +30,7 @@ source-repository head
 
 library
   build-depends:       base < 5,
+                       exceptions,
                        extra,
                        haskeline,
                        time

@@ -1,43 +1,62 @@
 module SimplePrompt.Internal (
-  getPromptOrError,
-  readNonEmpty,
-  readClear,
-  runPrompt
+  getPromptLine,
+  getPromptInitial,
+  getPromptChar,
+  nonEmptyInput,
+  timedInput,
+  runPrompt,
+  MonadIO,
+  MonadMask
   ) where
 
-import Control.Monad.IO.Class (liftIO)
+import Control.Monad.Catch (MonadMask)
+import Control.Monad.IO.Class (liftIO, MonadIO)
 import Data.Fixed (showFixed)
 import Data.Time.Clock (diffUTCTime, getCurrentTime, nominalDiffTimeToSeconds)
 
 import System.Console.Haskeline
 
-getPromptOrError :: String -> InputT IO String
-getPromptOrError s =
+-- | like getInputLine, but error if fails
+getPromptLine :: (MonadIO m, MonadMask m) => String -> InputT m String
+getPromptLine s =
   getInputLine (s ++ ": ") >>=
   maybe (error "could not get input line!") return
 
--- | does a non-empty prompt
-readNonEmpty :: IO String -> IO String
-readNonEmpty prompting = do
+-- | like getPromptLine, but with initial input
+getPromptInitial :: (MonadIO m, MonadMask m)
+                 => String -> String -> InputT m String
+getPromptInitial s i =
+  getInputLineWithInitial (s ++ ": ") (i,"") >>=
+  maybe (error "could not get input line!") return
+
+-- | like getInputLine, but error if fails
+getPromptChar :: (MonadIO m, MonadMask m) => String -> InputT m Char
+getPromptChar s =
+  getInputChar (s ++ ": ") >>=
+  maybe (error "could not read a character") return
+
+-- | repeat prompt until non-empty
+nonEmptyInput :: (MonadIO m, MonadMask m)
+              => InputT m String -> InputT m String
+nonEmptyInput prompting = do
   input <- prompting
   if null input
-    then readNonEmpty prompting
+    then nonEmptyInput prompting
     else return input
 
 -- | run a prompt
-runPrompt :: InputT IO String -> IO String
-runPrompt prompter =
-  runInputT defaultSettings prompter
+runPrompt :: (MonadIO m, MonadMask m) => InputT m a -> m a
+runPrompt =  runInputT defaultSettings
 
-readClear :: String -> InputT IO String
-readClear s = do
+timedInput :: MonadIO m => InputT m a -> InputT m a
+timedInput prompter = do
   start <- liftIO getCurrentTime
-  input <- getPromptOrError s
+  input <- prompter
   end <- liftIO getCurrentTime
   let diff = diffUTCTime end start
   if diff < 0.005
     then do
     outputStrLn $ "ignoring buffered input: " ++
       showFixed True (nominalDiffTimeToSeconds diff) ++ " too quick"
-    readClear s
+    timedInput prompter
     else return input
