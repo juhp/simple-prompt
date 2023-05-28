@@ -12,7 +12,7 @@ module SimplePrompt (
   yesNoDefault
   ) where
 
-import Control.Monad (unless)
+import Control.Monad (void)
 import Data.List.Extra (lower, trim)
 
 import SimplePrompt.Internal
@@ -50,12 +50,8 @@ promptChar =
 
 -- | prompt for Enter key
 promptEnter :: MONADCONSTRAINT => String -> m ()
-promptEnter s =
-  runPrompt loop
-  where
-    loop = do
-      c <- timedInput $ getPromptChar s
-      unless (c == '\n') loop
+promptEnter =
+  void . runPrompt . guardInput (== '\n') . timedInput . getPromptChar
 
 -- | Yes-No prompt (accepts only {y,n,yes,no} case-insensitive)
 yesNo :: MONADCONSTRAINT => String -> m Bool
