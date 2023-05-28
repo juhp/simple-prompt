@@ -5,6 +5,7 @@ module SimplePrompt (
   promptInitial,
   promptBuffered,
   promptNonEmpty,
+  promptChar,
   promptEnter,
   promptPassword,
   yesNo,
@@ -42,13 +43,18 @@ promptNonEmpty = runPrompt . nonEmptyInput . getPromptLine
 promptPassword :: MONADCONSTRAINT => String -> m String
 promptPassword = runPrompt . nonEmptyInput . getPromptPassword
 
+-- | prompt for character key
+promptChar :: MONADCONSTRAINT => String -> m Char
+promptChar =
+  runPrompt . timedInput . getPromptChar
+
 -- | prompt for Enter key
 promptEnter :: MONADCONSTRAINT => String -> m ()
 promptEnter s =
   runPrompt loop
   where
     loop = do
-      c <- timedInput $ getPromptChar (s ++ ": ")
+      c <- timedInput $ getPromptChar s
       unless (c == '\n') loop
 
 -- | Yes-No prompt (accepts only {y,n,yes,no} case-insensitive)
