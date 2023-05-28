@@ -4,6 +4,7 @@ module SimplePrompt (
   promptBuffered,
   promptNonEmpty,
   promptEnter,
+  promptPassword,
   yesNo,
   yesNoDefault
   ) where
@@ -40,6 +41,9 @@ promptEnter s =
     loop = do
       c <- timedInput $ getPromptChar (s ++ ": ")
       unless (c == '\n') loop
+
+promptPassword :: (MonadIO m, MonadMask m) => String -> m String
+promptPassword = runPrompt . nonEmptyInput . getPromptPassword
 
 -- | Yes/No prompt
 yesNo :: (MonadIO m, MonadMask m) => String -> m Bool

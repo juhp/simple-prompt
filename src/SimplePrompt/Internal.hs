@@ -2,6 +2,8 @@ module SimplePrompt.Internal (
   getPromptLine,
   getPromptInitial,
   getPromptChar,
+  getPromptPassword,
+  getGenericPrompt,
   nonEmptyInput,
   timedInput,
   runPrompt,
@@ -16,24 +18,32 @@ import Data.Time.Clock (diffUTCTime, getCurrentTime, nominalDiffTimeToSeconds)
 
 import System.Console.Haskeline
 
+-- | generic prompt wrapper
+getGenericPrompt :: MonadIO m => (String -> InputT m (Maybe a))
+                 -> String -> InputT m a
+getGenericPrompt prompter s =
+  prompter (s ++ ": ") >>=
+  maybe (error "could not read input!") return
+
 -- | like getInputLine, but error if fails
 getPromptLine :: (MonadIO m, MonadMask m) => String -> InputT m String
-getPromptLine s =
-  getInputLine (s ++ ": ") >>=
-  maybe (error "could not get input line!") return
+getPromptLine =
+  getGenericPrompt getInputLine
 
 -- | like getPromptLine, but with initial input
 getPromptInitial :: (MonadIO m, MonadMask m)
                  => String -> String -> InputT m String
 getPromptInitial s i =
-  getInputLineWithInitial (s ++ ": ") (i,"") >>=
-  maybe (error "could not get input line!") return
+  getGenericPrompt (`getInputLineWithInitial` (i,"")) s
 
 -- | like getInputLine, but error if fails
 getPromptChar :: (MonadIO m, MonadMask m) => String -> InputT m Char
-getPromptChar s =
-  getInputChar (s ++ ": ") >>=
-  maybe (error "could not read a character") return
+getPromptChar =
+  getGenericPrompt getInputChar
+
+getPromptPassword :: (MonadIO m, MonadMask m) => String -> InputT m String
+getPromptPassword =
+  getGenericPrompt (getPassword Nothing)
 
 -- | repeat prompt until non-empty
 nonEmptyInput :: (MonadIO m, MonadMask m)
