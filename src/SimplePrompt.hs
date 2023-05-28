@@ -1,3 +1,5 @@
+{-# LANGUAGE CPP #-}
+
 module SimplePrompt (
   prompt,
   promptInitial,
@@ -14,28 +16,30 @@ import Data.List.Extra (lower, trim)
 
 import SimplePrompt.Internal
 
+#include "monadconstraint.h"
+
 -- FIXME use haveTerminalUI ?
 -- | prompt which drops buffered input (using timedInput)
 --
 -- Ignores buffered input line (ie if received in under 5ms)
-prompt :: (MonadIO m, MonadMask m) => String -> m String
+prompt :: MONADCONSTRAINT => String -> m String
 prompt = runPrompt . timedInput . getPromptLine
 
 -- FIXME non-empty?
 -- | reads string with initial input (using timedInput)
-promptInitial :: (MonadIO m, MonadMask m) => String -> String -> m String
+promptInitial :: MONADCONSTRAINT => String -> String -> m String
 promptInitial s = runPrompt . timedInput . getPromptInitial s
 
 -- | reads string with buffering
-promptBuffered :: (MonadIO m, MonadMask m) => String -> m String
+promptBuffered :: MONADCONSTRAINT => String -> m String
 promptBuffered = runPrompt . getPromptLine
 
 -- | reads non-empty string (using readNonEmpty)
-promptNonEmpty :: (MonadIO m, MonadMask m) => String -> m String
+promptNonEmpty :: MONADCONSTRAINT => String -> m String
 promptNonEmpty = runPrompt . nonEmptyInput . getPromptLine
 
 -- | prompt for Enter key
-promptEnter :: (MonadIO m, MonadMask m) => String -> m ()
+promptEnter :: MONADCONSTRAINT => String -> m ()
 promptEnter s =
   runPrompt loop
   where
@@ -43,11 +47,11 @@ promptEnter s =
       c <- timedInput $ getPromptChar (s ++ ": ")
       unless (c == '\n') loop
 
-promptPassword :: (MonadIO m, MonadMask m) => String -> m String
+promptPassword :: MONADCONSTRAINT => String -> m String
 promptPassword = runPrompt . nonEmptyInput . getPromptPassword
 
 -- | Yes/No prompt
-yesNo :: (MonadIO m, MonadMask m) => String -> m Bool
+yesNo :: MONADCONSTRAINT => String -> m Bool
 yesNo desc = do
   runPrompt loop
   where
@@ -60,7 +64,7 @@ yesNo desc = do
         "no" -> return False
         _ ->  loop
 
-yesNoDefault :: (MonadIO m, MonadMask m) => Bool -> String -> m Bool
+yesNoDefault :: MONADCONSTRAINT => Bool -> String -> m Bool
 yesNoDefault yes desc =
   runPrompt loop
   where
