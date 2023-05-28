@@ -7,6 +7,7 @@ module SimplePrompt.Internal (
   getPromptPassword,
   getGenericPrompt,
   runPrompt,
+  guardInput,
   nonEmptyInput,
   timedInput,
   MonadIO,
@@ -58,13 +59,17 @@ getPromptPassword =
 runPrompt :: MONADCONSTRAINT => InputT m a -> m a
 runPrompt =  runInputT defaultSettings
 
+-- | guard prompt with check
+guardInput :: MONADCONSTRAINT => (a -> Bool) -> InputT m a -> InputT m a
+guardInput p prompting = do
+  input <- prompting
+  if p input
+    then return input
+    else guardInput p prompting
+
 -- | repeat prompt until non-empty
 nonEmptyInput :: MONADCONSTRAINT => InputT m String -> InputT m String
-nonEmptyInput prompting = do
-  input <- prompting
-  if null input
-    then nonEmptyInput prompting
-    else return input
+nonEmptyInput = guardInput (not . null)
 
 -- | repeat prompt if input returned within milliseconds
 timedInput :: MonadIO m => InputT m a -> InputT m a
