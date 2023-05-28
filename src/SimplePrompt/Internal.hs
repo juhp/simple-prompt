@@ -21,8 +21,7 @@ module SimplePrompt.Internal (
 import Control.Monad.Catch (MonadMask)
 #endif
 import Control.Monad.IO.Class (liftIO, MonadIO)
-import Data.Fixed (showFixed)
-import Data.Time.Clock (diffUTCTime, getCurrentTime, nominalDiffTimeToSeconds)
+import Data.Time.Clock (diffUTCTime, getCurrentTime)
 
 import System.Console.Haskeline
 
@@ -74,7 +73,6 @@ timedInput prompter = do
   let diff = diffUTCTime end start
   if diff < 0.005
     then do
-    outputStrLn $ "ignoring buffered input: " ++
-      showFixed True (nominalDiffTimeToSeconds diff) ++ " too quick"
+    outputStrLn $ "ignoring buffered input: " ++ show diff ++ " too quick"
     timedInput prompter
     else return input
