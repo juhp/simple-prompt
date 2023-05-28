@@ -21,6 +21,7 @@ import SimplePrompt.Internal
 prompt :: (MonadIO m, MonadMask m) => String -> m String
 prompt = runPrompt . timedInput . getPromptLine
 
+-- FIXME non-empty?
 -- | reads string with initial input (using timedInput)
 promptInitial :: (MonadIO m, MonadMask m) => String -> String -> m String
 promptInitial s = runPrompt . timedInput . getPromptInitial s
