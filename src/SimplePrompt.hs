@@ -21,7 +21,7 @@ import SimplePrompt.Internal
 -- FIXME use haveTerminalUI ?
 -- | prompt which drops buffered input (using timedInput)
 --
--- Ignores buffered input line (ie if received in under 5ms)
+-- Ignores buffered input lines (ie if input line gotten in under 5ms)
 prompt :: MONADCONSTRAINT => String -> m String
 prompt = runPrompt . timedInput . getPromptLine
 
@@ -34,9 +34,13 @@ promptInitial s = runPrompt . timedInput . getPromptInitial s
 promptBuffered :: MONADCONSTRAINT => String -> m String
 promptBuffered = runPrompt . getPromptLine
 
--- | reads non-empty string (using readNonEmpty)
+-- | reads non-empty string (using nonEmptyInput)
 promptNonEmpty :: MONADCONSTRAINT => String -> m String
 promptNonEmpty = runPrompt . nonEmptyInput . getPromptLine
+
+-- | prompt for a password
+promptPassword :: MONADCONSTRAINT => String -> m String
+promptPassword = runPrompt . nonEmptyInput . getPromptPassword
 
 -- | prompt for Enter key
 promptEnter :: MONADCONSTRAINT => String -> m ()
@@ -47,10 +51,7 @@ promptEnter s =
       c <- timedInput $ getPromptChar (s ++ ": ")
       unless (c == '\n') loop
 
-promptPassword :: MONADCONSTRAINT => String -> m String
-promptPassword = runPrompt . nonEmptyInput . getPromptPassword
-
--- | Yes/No prompt
+-- | Yes-No prompt (accepts only {y,n,yes,no} case-insensitive)
 yesNo :: MONADCONSTRAINT => String -> m Bool
 yesNo desc = do
   runPrompt loop
@@ -64,6 +65,7 @@ yesNo desc = do
         "no" -> return False
         _ ->  loop
 
+-- | Yes-No prompt with default (uses timedInput)
 yesNoDefault :: MONADCONSTRAINT => Bool -> String -> m Bool
 yesNoDefault yes desc =
   runPrompt loop

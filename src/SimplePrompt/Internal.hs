@@ -6,9 +6,9 @@ module SimplePrompt.Internal (
   getPromptChar,
   getPromptPassword,
   getGenericPrompt,
+  runPrompt,
   nonEmptyInput,
   timedInput,
-  runPrompt,
   MonadIO,
 #if MIN_VERSION_haskeline(0,8,0)
   MonadMask
@@ -44,14 +44,19 @@ getPromptInitial :: MONADCONSTRAINT => String -> String -> InputT m String
 getPromptInitial s i =
   getGenericPrompt (`getInputLineWithInitial` (i,"")) s
 
--- | like getInputLine, but error if fails
+-- | like getInputChar, but error if fails
 getPromptChar :: MONADCONSTRAINT => String -> InputT m Char
 getPromptChar =
   getGenericPrompt getInputChar
 
+-- | get password
 getPromptPassword :: MONADCONSTRAINT => String -> InputT m String
 getPromptPassword =
   getGenericPrompt (getPassword Nothing)
+
+-- | run a prompt
+runPrompt :: MONADCONSTRAINT => InputT m a -> m a
+runPrompt =  runInputT defaultSettings
 
 -- | repeat prompt until non-empty
 nonEmptyInput :: MONADCONSTRAINT => InputT m String -> InputT m String
@@ -61,10 +66,7 @@ nonEmptyInput prompting = do
     then nonEmptyInput prompting
     else return input
 
--- | run a prompt
-runPrompt :: MONADCONSTRAINT => InputT m a -> m a
-runPrompt =  runInputT defaultSettings
-
+-- | repeat prompt if input returned within milliseconds
 timedInput :: MonadIO m => InputT m a -> InputT m a
 timedInput prompter = do
   start <- liftIO getCurrentTime
