@@ -7,7 +7,7 @@
 - new functions: promptEnter, promptInitial, promptNonEmpty, promptPassword
 - yesNo and yesNoDefault replace yesno
 - internal haskeline functions in SimplePrompt.Internal: including
-  getPrompt*, runPrompt, guardInput, mapInput, nonEmptyInput, timedInput
+  getPrompt*, runPrompt, untilInput, mapInput, nonEmptyInput, timedInput
 
 ## 0.1.0 (2023-04-02)
 - initial release with prompt, prompt_, yesno functions

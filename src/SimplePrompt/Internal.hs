@@ -7,7 +7,7 @@ module SimplePrompt.Internal (
   getPromptPassword,
   getGenericPrompt,
   runPrompt,
-  guardInput,
+  untilInput,
   mapInput,
   nonEmptyInput,
   timedInput,
@@ -60,13 +60,13 @@ getPromptPassword =
 runPrompt :: MONADCONSTRAINT => InputT m a -> m a
 runPrompt =  runInputT defaultSettings
 
--- | guard prompt with check
-guardInput :: MONADCONSTRAINT => (a -> Bool) -> InputT m a -> InputT m a
-guardInput p prompting = do
+-- | loop prompt until check
+untilInput :: MONADCONSTRAINT => (a -> Bool) -> InputT m a -> InputT m a
+untilInput p prompting = do
   input <- prompting
   if p input
     then return input
-    else guardInput p prompting
+    else untilInput p prompting
 
 -- | maybe map input or loop prompt
 mapInput :: MONADCONSTRAINT => (a -> Maybe b) -> InputT m a -> InputT m b
@@ -78,7 +78,7 @@ mapInput f prompting = do
 
 -- | repeat prompt until non-empty
 nonEmptyInput :: MONADCONSTRAINT => InputT m String -> InputT m String
-nonEmptyInput = guardInput (not . null)
+nonEmptyInput = untilInput (not . null)
 
 -- | repeat prompt if input returned within milliseconds
 timedInput :: MonadIO m => InputT m a -> InputT m a
