@@ -4,7 +4,8 @@ module SimplePrompt (
   promptBuffered,
   promptNonEmpty,
   promptEnter,
-  yesNo
+  yesNo,
+  yesNoDefault
   ) where
 
 import Control.Monad (unless)
@@ -53,3 +54,17 @@ promptEnter s =
     loop = do
       c <- timedInput $ getPromptChar (s ++ ": ")
       unless (c == '\n') loop
+
+yesNoDefault :: (MonadIO m, MonadMask m) => Bool -> String -> m Bool
+yesNoDefault yes desc =
+  runPrompt loop
+  where
+    loop = do
+      inp <- timedInput $ getPromptLine $ desc ++ "? " ++ if yes then "[Y/n]" else "[y/N]"
+      case trim (lower inp) of
+        "y" -> return True
+        "yes" -> return True
+        "n" -> return False
+        "no" -> return False
+        "" -> return yes
+        _ ->  loop
