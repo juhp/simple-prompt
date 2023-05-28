@@ -32,6 +32,15 @@ promptBuffered = runPrompt . getPromptLine
 promptNonEmpty :: (MonadIO m, MonadMask m) => String -> m String
 promptNonEmpty = runPrompt . nonEmptyInput . getPromptLine
 
+-- | prompt for Enter key
+promptEnter :: (MonadIO m, MonadMask m) => String -> m ()
+promptEnter s =
+  runPrompt loop
+  where
+    loop = do
+      c <- timedInput $ getPromptChar (s ++ ": ")
+      unless (c == '\n') loop
+
 -- | Yes/No prompt
 yesNo :: (MonadIO m, MonadMask m) => String -> m Bool
 yesNo desc = do
@@ -45,15 +54,6 @@ yesNo desc = do
         "n" -> return False
         "no" -> return False
         _ ->  loop
-
--- | prompt for Enter key
-promptEnter :: (MonadIO m, MonadMask m) => String -> m ()
-promptEnter s =
-  runPrompt loop
-  where
-    loop = do
-      c <- timedInput $ getPromptChar (s ++ ": ")
-      unless (c == '\n') loop
 
 yesNoDefault :: (MonadIO m, MonadMask m) => Bool -> String -> m Bool
 yesNoDefault yes desc =
