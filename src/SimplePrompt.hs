@@ -6,45 +6,21 @@ module SimplePrompt (
   ) where
 
 import Control.Monad (void)
-import Control.Monad.IO.Class (liftIO)
 import Data.List.Extra (lower, trim)
-import Data.Time.Clock
 
-import System.Console.Haskeline
+import SimplePrompt.Internal
 
--- | reads non-empty string
+-- | reads string
 prompt :: String -> IO String
-prompt s =
-  runInputT defaultSettings loop
-    where
-      loop :: InputT IO String
-      loop =
-        getInputLine (s ++ ": ") >>=
-        maybe loop return
+prompt = runPrompt . getPromptOrError
 
 -- FIXME use haveTerminalUI ?
 -- | prompt which drops buffered input
 --
--- Ignores input received in under 5ms
+-- Ignores buffered input lines (ie received in under 5ms)
 promptClear :: String -> IO String
-promptClear s =
-  runInputT defaultSettings loop
-    where
-      loop :: InputT IO String
-      loop = do
-        start <- liftIO getCurrentTime
-        minput <- getInputLine $ s ++ ": "
-        end <- liftIO getCurrentTime
-        let diff = diffUTCTime end start
-        if diff < 0.005
-          then do
-          outputStrLn $
-            "ignoring buffered input: " ++ show diff ++ " too quick"
-          loop
-          else
-          case minput of
-            Nothing -> return ""
-            Just input -> return input
+promptClear =
+  runPrompt . readClear
 
 -- | prompt which ignores the input
 prompt_ :: String -> IO ()
