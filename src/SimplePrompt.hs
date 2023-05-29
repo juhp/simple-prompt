@@ -51,7 +51,7 @@ promptChar =
 -- | prompt for Enter key
 promptEnter :: MONADCONSTRAINT => String -> m ()
 promptEnter =
-  void . runPrompt . untilInput (== '\n') . timedInput . getPromptChar
+  void . runPrompt . untilInput (== "") . timedInput . getPromptLine
 
 -- | Yes-No prompt (accepts only {y,n,yes,no} case-insensitive)
 yesNo :: MONADCONSTRAINT => String -> m Bool
