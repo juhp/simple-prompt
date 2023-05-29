@@ -1,5 +1,5 @@
 name:                simple-prompt
-version:             0.2.0
+version:             0.2.0.1
 synopsis:            Simple commandline text prompt functions
 description:
         The library provides prompt functions for reading user input:
@@ -17,6 +17,7 @@ bug-reports:         https://github.com/juhp/simple-prompt/issues
 build-type:          Simple
 extra-doc-files:     README.md
                      ChangeLog.md
+extra-source-files:  src/monadconstraint.h
 cabal-version:       2.0
 tested-with:         GHC == 8.6.5
                      || == 8.8.4
