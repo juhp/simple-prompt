@@ -2,6 +2,8 @@
 
 A simple commandline text prompt library for user input.
 
+The `SimplePrompt` module provides:
+
 - `prompt`: returns a string
 - `promptNonEmpty` prompts for non-empty string
 - `promptInitial` with pre-filled initial input
@@ -12,3 +14,9 @@ A simple commandline text prompt library for user input.
 - `yesNoDefault` [y/N] or [Y/n]
 
 It uses haskeline to read the input.
+
+The `SimplePrompt.Internal` module provides lower-level access to
+functional haskeline InputT monad transformer-based prompt functions:
+
+- `runPrompt`, `getPrompt*`
+- `untilInput`, `mapInput`, `timedInput`, `nonEmptyInput`.
