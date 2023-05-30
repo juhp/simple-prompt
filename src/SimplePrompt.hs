@@ -20,16 +20,16 @@ import SimplePrompt.Internal
 #include "monadconstraint.h"
 
 -- FIXME use haveTerminalUI ?
--- | prompt which drops buffered input (using timedInput)
+-- | prompt which drops buffered input (using clearedInput)
 --
 -- Ignores buffered input lines (ie if input line gotten in under 5ms)
 prompt :: MONADCONSTRAINT => String -> m String
-prompt = runPrompt . timedInput . getPromptLine
+prompt = runPrompt . clearedInput . getPromptLine
 
 -- FIXME non-empty?
--- | reads string with initial input (using timedInput)
+-- | reads string with initial input (using clearedInput)
 promptInitial :: MONADCONSTRAINT => String -> String -> m String
-promptInitial s = runPrompt . timedInput . getPromptInitial s
+promptInitial s = runPrompt . clearedInput . getPromptInitial s
 
 -- | reads string with buffering
 promptBuffered :: MONADCONSTRAINT => String -> m String
@@ -46,12 +46,12 @@ promptPassword = runPrompt . nonEmptyInput . getPromptPassword
 -- | prompt for character key
 promptChar :: MONADCONSTRAINT => String -> m Char
 promptChar =
-  runPrompt . timedInput . getPromptChar
+  runPrompt . clearedInput . getPromptChar
 
 -- | prompt for Enter key
 promptEnter :: MONADCONSTRAINT => String -> m ()
 promptEnter =
-  void . runPrompt . untilInput (== "") . timedInput . getPromptLine
+  void . runPrompt . untilInput (== "") . clearedInput . getPromptLine
 
 -- | Yes-No prompt (accepts only {y,n,yes,no} case-insensitive)
 yesNo :: MONADCONSTRAINT => String -> m Bool
@@ -66,10 +66,10 @@ yesNo desc =
         "no" -> Just False
         _ ->  Nothing
 
--- | Yes-No prompt with default (uses timedInput)
+-- | Yes-No prompt with default (uses clearedInput)
 yesNoDefault :: MONADCONSTRAINT => Bool -> String -> m Bool
 yesNoDefault yes desc =
-  runPrompt . mapInput maybeYN' . timedInput . getPromptLine $
+  runPrompt . mapInput maybeYN' . clearedInput . getPromptLine $
   desc ++ "? " ++ if yes then "[Y/n]" else "[y/N]"
   where
     maybeYN' inp =

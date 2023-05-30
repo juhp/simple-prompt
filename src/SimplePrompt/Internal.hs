@@ -10,7 +10,7 @@ module SimplePrompt.Internal (
   untilInput,
   mapInput,
   nonEmptyInput,
-  timedInput,
+  clearedInput,
   MonadIO,
 #if MIN_VERSION_haskeline(0,8,0)
   MonadMask
@@ -81,8 +81,9 @@ nonEmptyInput :: MONADCONSTRAINT => InputT m String -> InputT m String
 nonEmptyInput = untilInput (not . null)
 
 -- | repeat prompt if input returned within milliseconds
-timedInput :: MonadIO m => InputT m a -> InputT m a
-timedInput prompter = do
+-- This prevents buffered stdin lines from being used.
+clearedInput :: MonadIO m => InputT m a -> InputT m a
+clearedInput prompter = do
   start <- liftIO getCurrentTime
   input <- prompter
   end <- liftIO getCurrentTime
@@ -90,5 +91,5 @@ timedInput prompter = do
   if diff < 0.005
     then do
     outputStrLn $ "ignoring buffered input: " ++ show diff ++ " too quick"
-    timedInput prompter
+    clearedInput prompter
     else return input

@@ -19,4 +19,4 @@ The `SimplePrompt.Internal` module provides lower-level access to
 functional haskeline InputT monad transformer-based prompt functions:
 
 - `runPrompt`, `getPrompt*`
-- `untilInput`, `mapInput`, `timedInput`, `nonEmptyInput`.
+- `untilInput`, `mapInput`, `clearedInput`, `nonEmptyInput`.
