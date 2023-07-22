@@ -3,7 +3,7 @@
 ## 0.2.0 (2023-05-28)
 - new API using haskeline and MonadIO
 - prompt ignores buffered stdin lines if it returns in milliseconds
-- promptEnter replaces Prompt_
+- promptEnter replaces prompt_
 - new functions: promptEnter, promptInitial, promptNonEmpty, promptPassword
 - yesNo and yesNoDefault replace yesno
 - internal haskeline functions in SimplePrompt.Internal: including
