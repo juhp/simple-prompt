@@ -13,7 +13,7 @@ module SimplePrompt (
   ) where
 
 import Control.Monad (void)
-import Data.List.Extra (lower, trim)
+import Data.List.Extra (lower)
 
 import SimplePrompt.Internal
 
@@ -59,7 +59,7 @@ yesNo desc =
   runPrompt . mapInput maybeYN . getPromptLine $ desc ++ "? [y/n]"
   where
     maybeYN inp =
-      case trim (lower inp) of
+      case lower inp of
         "y" -> Just True
         "yes" -> Just True
         "n" -> Just False
@@ -73,7 +73,7 @@ yesNoDefault yes desc =
   desc ++ "? " ++ if yes then "[Y/n]" else "[y/N]"
   where
     maybeYN' inp =
-      case trim (lower inp) of
+      case lower inp of
         "" -> Just yes
         "y" -> Just True
         "yes" -> Just True
