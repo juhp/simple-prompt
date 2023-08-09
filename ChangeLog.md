@@ -1,5 +1,9 @@
 # Revision history for simple-prompt
 
+## 0.2.1 (2023-08-09)
+- do not trim spaces for yesNo and yesNoDefault
+- Internal: timedInput renamed to clearedInput
+
 ## 0.2.0 (2023-05-28)
 - new API using haskeline and MonadIO
 - prompt ignores buffered stdin lines if it returns in milliseconds
