@@ -8,7 +8,8 @@ The `SimplePrompt` module provides:
 - `promptNonEmpty` prompts for non-empty string
 - `promptInitial` with pre-filled initial input
 - `promptPassword` prompts for password
-- `promptChar` prompt for a character
+- `promptChar` prompts for a character
+- `promptKeyPress` waits for a key press
 - `promptEnter` waits for Enter key
 - `yesNo` expects y/n answer
 - `yesNoDefault` [y/N] or [Y/n]

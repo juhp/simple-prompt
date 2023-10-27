@@ -1,5 +1,5 @@
 name:                simple-prompt
-version:             0.2.1
+version:             0.2.2
 synopsis:            Simple commandline text prompt functions
 description:
         The library provides prompt functions for reading user input:
@@ -24,7 +24,8 @@ tested-with:         GHC == 8.6.5
                      || == 8.10.7
                      || == 9.0.2
                      || == 9.2.8
-                     || == 9.4.5
+                     || == 9.4.7
+                     || == 9.6.3
 
 source-repository head
   type:                git

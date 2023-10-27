@@ -1,5 +1,8 @@
 # Revision history for simple-prompt
 
+## 0.2.2 (2023-10-27)
+- add promptKeyPress
+
 ## 0.2.1 (2023-08-09)
 - do not trim spaces for yesNo and yesNoDefault
 - Internal: timedInput renamed to clearedInput
