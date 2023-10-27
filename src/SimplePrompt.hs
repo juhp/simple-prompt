@@ -6,6 +6,7 @@ module SimplePrompt (
   promptBuffered,
   promptNonEmpty,
   promptChar,
+  promptKeyPress,
   promptEnter,
   promptPassword,
   yesNo,
@@ -14,6 +15,7 @@ module SimplePrompt (
 
 import Control.Monad (void)
 import Data.List.Extra (lower)
+import System.Console.Haskeline (waitForAnyKey)
 
 import SimplePrompt.Internal
 
@@ -47,6 +49,11 @@ promptPassword = runPrompt . nonEmptyInput . getPromptPassword
 promptChar :: MONADCONSTRAINT => String -> m Char
 promptChar =
   runPrompt . clearedInput . getPromptChar
+
+-- | prompt for key press (returns False if Ctrl-d or EOF)
+promptKeyPress :: MONADCONSTRAINT => String -> m Bool
+promptKeyPress =
+  runPrompt . clearedInput . waitForAnyKey
 
 -- | prompt for Enter key
 promptEnter :: MONADCONSTRAINT => String -> m ()
