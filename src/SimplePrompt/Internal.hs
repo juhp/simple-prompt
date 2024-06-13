@@ -82,9 +82,8 @@ clearedInput prompter = do
   start <- liftIO getCurrentTime
   input <- prompter
   end <- liftIO getCurrentTime
-  let diff = diffUTCTime end start
-  if diff < 0.005
+  if diffUTCTime end start < 0.005
     then do
-    outputStrLn $ "ignoring buffered input: " ++ show diff ++ " too quick"
+    outputStrLn "dropped buffered input"
     clearedInput prompter
     else return input
