@@ -13,6 +13,7 @@ module SimplePrompt.Internal (
 
 import Control.Monad.IO.Class (liftIO)
 import Data.Time.Clock (diffUTCTime, getCurrentTime)
+import Safe (lastMay)
 
 import System.Console.Haskeline
 import Constraint
@@ -21,7 +22,13 @@ import Constraint
 getGenericPrompt :: MonadIO m => (String -> InputT m (Maybe a))
                  -> String -> InputT m a
 getGenericPrompt prompter s =
-  prompter (s ++ ": ") >>=
+  let suff =
+        case lastMay s of
+          Just '\n' -> ""
+          Just ':' -> " "
+          _ -> ": "
+  in
+  prompter (s ++ suff) >>=
   maybe (error "could not read input!") return
 
 -- | like getInputLine, but error if fails

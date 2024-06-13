@@ -35,6 +35,7 @@ library
                        exceptions,
                        extra,
                        haskeline > 0.8,
+                       safe,
                        time
 
   default-language:    Haskell2010
