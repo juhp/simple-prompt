@@ -1,5 +1,9 @@
 # Revision history for simple-prompt
 
+## 0.2.3 (2024-06-13)
+- getGenericPrompt: adapt prompt suffix for final newline or colon
+- clearedInput no longer prints short duration for any buffered input
+
 ## 0.2.2 (2023-10-27)
 - add promptKeyPress
 
