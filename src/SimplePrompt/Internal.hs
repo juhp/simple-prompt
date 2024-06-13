@@ -1,5 +1,3 @@
-{-# LANGUAGE CPP #-}
-
 module SimplePrompt.Internal (
   getPromptLine,
   getPromptInitial,
@@ -10,24 +8,14 @@ module SimplePrompt.Internal (
   untilInput,
   mapInput,
   nonEmptyInput,
-  clearedInput,
-  MonadIO,
-#if MIN_VERSION_haskeline(0,8,0)
-  MonadMask
-#else
-  MonadException
-#endif
+  clearedInput
   ) where
 
-#if MIN_VERSION_haskeline(0,8,0)
-import Control.Monad.Catch (MonadMask)
-#endif
-import Control.Monad.IO.Class (liftIO, MonadIO)
+import Control.Monad.IO.Class (liftIO)
 import Data.Time.Clock (diffUTCTime, getCurrentTime)
 
 import System.Console.Haskeline
-
-#include "../monadconstraint.h"
+import Constraint
 
 -- | generic prompt wrapper
 getGenericPrompt :: MonadIO m => (String -> InputT m (Maybe a))
@@ -37,31 +25,31 @@ getGenericPrompt prompter s =
   maybe (error "could not read input!") return
 
 -- | like getInputLine, but error if fails
-getPromptLine :: MONADCONSTRAINT => String -> InputT m String
+getPromptLine :: MONADCONSTRAINT m => String -> InputT m String
 getPromptLine =
   getGenericPrompt getInputLine
 
 -- | like getPromptLine, but with initial input
-getPromptInitial :: MONADCONSTRAINT => String -> String -> InputT m String
+getPromptInitial :: MONADCONSTRAINT m => String -> String -> InputT m String
 getPromptInitial s i =
   getGenericPrompt (`getInputLineWithInitial` (i,"")) s
 
 -- | like getInputChar, but error if fails
-getPromptChar :: MONADCONSTRAINT => String -> InputT m Char
+getPromptChar :: MONADCONSTRAINT m => String -> InputT m Char
 getPromptChar =
   getGenericPrompt getInputChar
 
 -- | get password
-getPromptPassword :: MONADCONSTRAINT => String -> InputT m String
+getPromptPassword :: MONADCONSTRAINT m => String -> InputT m String
 getPromptPassword =
   getGenericPrompt (getPassword Nothing)
 
 -- | run a prompt
-runPrompt :: MONADCONSTRAINT => InputT m a -> m a
+runPrompt :: MONADCONSTRAINT m => InputT m a -> m a
 runPrompt =  runInputT defaultSettings
 
 -- | loop prompt until check
-untilInput :: MONADCONSTRAINT => (a -> Bool) -> InputT m a -> InputT m a
+untilInput :: MONADCONSTRAINT m => (a -> Bool) -> InputT m a -> InputT m a
 untilInput p prompting = do
   input <- prompting
   if p input
@@ -69,7 +57,7 @@ untilInput p prompting = do
     else untilInput p prompting
 
 -- | maybe map input or loop prompt
-mapInput :: MONADCONSTRAINT => (a -> Maybe b) -> InputT m a -> InputT m b
+mapInput :: MONADCONSTRAINT m => (a -> Maybe b) -> InputT m a -> InputT m b
 mapInput f prompting = do
   input <- prompting
   case f input of
@@ -77,7 +65,7 @@ mapInput f prompting = do
     Nothing -> mapInput f prompting
 
 -- | repeat prompt until non-empty
-nonEmptyInput :: MONADCONSTRAINT => InputT m String -> InputT m String
+nonEmptyInput :: MONADCONSTRAINT m => InputT m String -> InputT m String
 nonEmptyInput = untilInput (not . null)
 
 -- | repeat prompt if input returned within milliseconds
