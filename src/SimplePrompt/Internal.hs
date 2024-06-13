@@ -31,17 +31,17 @@ getGenericPrompt prompter s =
   prompter (s ++ suff) >>=
   maybe (error "could not read input!") return
 
--- | like getInputLine, but error if fails
+-- | like `getInputLine`, but error if fails
 getPromptLine :: MONADCONSTRAINT m => String -> InputT m String
 getPromptLine =
   getGenericPrompt getInputLine
 
--- | like getPromptLine, but with initial input
+-- | like `getPromptLine`, but with initial input
 getPromptInitial :: MONADCONSTRAINT m => String -> String -> InputT m String
 getPromptInitial s i =
   getGenericPrompt (`getInputLineWithInitial` (i,"")) s
 
--- | like getInputChar, but error if fails
+-- | like `getInputChar`, but error if fails
 getPromptChar :: MONADCONSTRAINT m => String -> InputT m Char
 getPromptChar =
   getGenericPrompt getInputChar

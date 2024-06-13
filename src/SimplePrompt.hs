@@ -19,14 +19,14 @@ import SimplePrompt.Internal
 import Constraint
 
 -- FIXME use haveTerminalUI ?
--- | prompt which drops buffered input (using clearedInput)
+-- | prompt which drops buffered input (using `clearedInput`)
 --
 -- Ignores buffered input lines (ie if input line gotten in under 5ms)
 prompt :: MONADCONSTRAINT m => String -> m String
 prompt = runPrompt . clearedInput . getPromptLine
 
 -- FIXME non-empty?
--- | reads string with initial input (using clearedInput)
+-- | reads string with initial input (using `clearedInput`)
 promptInitial :: MONADCONSTRAINT m => String -> String -> m String
 promptInitial s = runPrompt . clearedInput . getPromptInitial s
 
@@ -34,7 +34,7 @@ promptInitial s = runPrompt . clearedInput . getPromptInitial s
 promptBuffered :: MONADCONSTRAINT m => String -> m String
 promptBuffered = runPrompt . getPromptLine
 
--- | reads non-empty string (using nonEmptyInput)
+-- | reads non-empty string (using `nonEmptyInput`)
 promptNonEmpty :: MONADCONSTRAINT m => String -> m String
 promptNonEmpty = runPrompt . nonEmptyInput . getPromptLine
 
@@ -70,7 +70,7 @@ yesNo desc =
         "no" -> Just False
         _ ->  Nothing
 
--- | Yes-No prompt with default (uses clearedInput)
+-- | Yes-No prompt with default (uses `clearedInput`)
 yesNoDefault :: MONADCONSTRAINT m => Bool -> String -> m Bool
 yesNoDefault yes desc =
   runPrompt . mapInput maybeYN' . clearedInput . getPromptLine $
